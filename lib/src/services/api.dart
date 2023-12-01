@@ -26,23 +26,22 @@ class Api {
           return handler.next(response);
         },
         onError: (e, handler) {
-          print(e);
           return handler.next(e);
         },
       ),
     );
 
   Future<int?> checkLogin(String username, String password) async {
-    final Response response = await _dio.post('/login', data: {
+    final Response response = await _dio.post('/user/login', data: {
       'username': username,
       'password': password,
     });
     if (response.statusCode == 200) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       Login valueMap = loginFromJson(jsonEncode(response.data));
-      await prefs.setString('userid', valueMap.userId);
-      await prefs.setString('username', valueMap.username);
       await prefs.setString('token', valueMap.token);
+      await prefs.setString('username', valueMap.username);
+      await prefs.setString('display', valueMap.display);
       return response.statusCode;
     } else {
       return response.statusCode;

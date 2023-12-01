@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:temp_noti/src/configs/route.dart' as custom_route;
 import 'package:temp_noti/src/widgets/home/machinelist.dart';
 
@@ -10,9 +11,50 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  void _signout() {
-    Navigator.pop(context);
-    Navigator.pushNamed(context, custom_route.Route.login);
+  @override
+  void initState() {
+    //SharedPreferences prefs = await SharedPreferences.getInstance();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+  void _logout() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Logout!!'),
+          content: const Text('ต้องการที่จะออกจากระบบ?'),
+          actions: [
+            TextButton(
+              child: const Text('ยกเลิก'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+              },
+            ),
+            TextButton(
+              child:
+                  const Text('ออกจากระบบ', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                SharedPreferences.getInstance().then((prefs) {
+                  prefs.clear();
+                  Navigator.of(dialogContext).pop();
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    custom_route.Route.login,
+                    (route) => false,
+                  );
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -35,7 +77,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: const MachineList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _signout,
+        onPressed: _logout,
         tooltip: 'ลงชื่อออก',
         child: const Icon(Icons.logout),
       ), // This trailing comma makes auto-formatting nicer for build methods.
